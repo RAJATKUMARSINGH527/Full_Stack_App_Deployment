@@ -1,30 +1,63 @@
-import React, { useState } from "react";
-import axios from "axios";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-
 const Login = () => {
-  const [form, setForm] = useState({ email: "", password: "" });
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await axios.post("https://full-stack-app-deployment.onrender.com/auth/login", form);
-      localStorage.setItem("token", response.data.token);
-      toast.success("Login successful!");
-      navigate("/dashboard");
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Login failed.");
-    }
+  const handleLogin = () => {
+    setLoading(true);
+    setError(null);
+
+    const payload = { email, password };
+
+    fetch("https://full-stack-app-deployment.onrender.com/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setLoading(false);
+        if (data.token) {
+          localStorage.setItem("token", data.token);
+          alert("Login successful!");
+          navigate("/dashboard");
+        } else {
+          setError(data.message || "Login failed. Please try again.");
+        }
+      })
+      .catch((error) => {
+        setLoading(false);
+        setError("An error occurred. Please try again.");
+      });
   };
 
   return (
-    <form onSubmit={handleLogin}>
-      <input type="email" placeholder="Email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
-      <input type="password" placeholder="Password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required />
-      <button type="submit">Login</button>
-    </form>
+    <>
+      <h2>Please Login</h2>
+      {error && <p style={{ color: "red" }}>{error}</p>}
+      <input
+        type="email"
+        placeholder="Enter your Email..."
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
+      <input
+        type="password"
+        placeholder="Enter Your Password..."
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      />
+      <button onClick={handleLogin} disabled={loading}>
+        {loading ? "Logging in..." : "Login"}
+      </button>
+    </>
   );
 };
 

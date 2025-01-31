@@ -4,8 +4,8 @@ const productSchema = new mongoose.Schema({
     name: { type: String, required: true },
     description: { type: String },
     price: { type: Number, required: true },
-    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "user", required: true },
-},{ timestamps: true,
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: "user", required: true },
+},{
     versionKey: false,
  });
 

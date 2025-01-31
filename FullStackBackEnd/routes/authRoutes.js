@@ -8,11 +8,11 @@ const authRoutes  = express.Router();
 
 // Register
 authRoutes .post("/signup", async (req, res) => {
-  const { email, password } = req.body;
+  const { name, email, password } = req.body;
 
   try {
     const hashedPassword = await bcrypt.hash(password, Number(process.env.SALT_ROUNDS));
-    const newUser = new UserModel({ email, password: hashedPassword });
+    const newUser = new UserModel({name,  email, password: hashedPassword });
     await newUser.save();
     res.status(201).json({ message: "User registered successfully" });
   } catch (err) {
@@ -32,7 +32,7 @@ authRoutes .post("/login", async (req, res) => {
     if (!isMatch) return res.status(401).json({ error: "Invalid credentials" });
 
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET_KEY, { expiresIn: "1h" });
-    res.json({ token });
+    res.json({message:"User Logged in Successfully", token });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

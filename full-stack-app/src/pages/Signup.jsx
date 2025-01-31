@@ -1,30 +1,70 @@
-import React, { useState } from "react";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
-
+import { useState } from "react";
 
 const Signup = () => {
-  const [form, setForm] = useState({ name: "", email: "", password: "" });
-  const navigate = useNavigate();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);  // For showing loading state
 
-  const handleSignup = async (e) => {
-    e.preventDefault();
-    try {
-      await axios.post("https://full-stack-app-deployment.onrender.com/auth/signup", form);
-      success("Signup successful! Please login.");
-      navigate("/login");
-    } catch (error) {
-      error(error.response?.data?.message || "Signup failed.");
-    }
+  const handleRegister = () => {
+    const payload = {
+      name,
+      email,
+      password,
+    };
+
+    setLoading(true);  // Set loading to true when the request starts
+
+    fetch("https://full-stack-app-deployment.onrender.com/auth/signup", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setLoading(false);  // Set loading to false when request completes
+        alert(data.message);  // Handle response message
+      })
+      .catch((err) => {
+        setLoading(false);  // Set loading to false on error
+        console.error(err);
+        alert("Error during registration! Please try again.");
+      });
   };
 
+  // Disable submit if any field is empty
+  const isFormValid = name && email && password;
+
   return (
-    <form onSubmit={handleSignup}>
-      <input type="text" placeholder="Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
-      <input type="email" placeholder="Email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
-      <input type="password" placeholder="Password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required />
-      <button type="submit">Sign Up</button>
-    </form>
+    <>
+      <h2>Please register yourself!</h2>
+      <input
+        type="text"
+        placeholder="Enter Your Name..."
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+      />
+      <input
+        type="email"  // Use "email" type for validation
+        placeholder="Enter Your Email Id..."
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
+      <input
+        type="password"  // Use "password" type to hide text
+        placeholder="Enter Your Password..."
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      />
+      <button 
+        onClick={handleRegister} 
+        disabled={!isFormValid || loading}  // Disable if form is invalid or request is loading
+      >
+        {loading ? "Registering..." : "Register!!"}
+      </button>
+    </>
   );
 };
 

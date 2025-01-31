@@ -1,27 +1,29 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
-import ProtectedRoute from "./components/ProtectedRoute";
 import Products from "./components/Products";
 
-
-
 const App = () => {
+  const token = localStorage.getItem("token"); // Check if user is logged in
+
   return (
-    <Router>
+    <BrowserRouter>
       <Navbar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-        <Route path="/products" element={<ProtectedRoute><Products /></ProtectedRoute>}/>
-      </Routes>
-    </Router>
+      <main>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/login" element={<Login />} />
+          {/* Protected Routes */}
+          <Route path="/dashboard" element={token ? <Dashboard /> : <Login />} />
+          <Route path="/products" element={token ? <Products /> : <Login />} />
+        </Routes>
+      </main>
+    </BrowserRouter>
   );
 };
 

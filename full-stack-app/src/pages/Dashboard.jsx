@@ -1,75 +1,128 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-
+import { useState, useEffect } from "react";
 
 const Dashboard = () => {
   const [products, setProducts] = useState([]);
-  const [form, setForm] = useState({ name: "", description: "", price: "" });
-  const [editId, setEditId] = useState(null);
-  const token = localStorage.getItem("token");
+  const [editMode, setEditMode] = useState(null);
+  const [updatedName, setUpdatedName] = useState("");
+  const [updatedPrice, setUpdatedPrice] = useState("");
+  const [updatedDescription, setUpdatedDescription] = useState("");
 
+  // Fetch products when the component mounts
   useEffect(() => {
-    fetchProducts();
+    fetch("https://full-stack-app-deployment.onrender.com/products", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setProducts(data.products || []);
+      })
+      .catch((err) => console.error(err));
   }, []);
 
-  const fetchProducts = async () => {
-    try {
-      const response = await axios.get("https://full-stack-app-deployment.onrender.com/products", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setProducts(response.data);
-    } catch (error) {
-      toast.error("Failed to fetch products!");
-    }
+  // Handle product editing
+  const handleEdit = (productId) => {
+    fetch(`https://full-stack-app-deployment.onrender.com/products/${productId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: JSON.stringify({
+        name: updatedName,
+        price: updatedPrice,
+        description: updatedDescription,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        alert(data.message);
+
+        setProducts((prevProducts) =>
+          prevProducts.map((product) =>
+            product._id === productId
+              ? { ...product, name: updatedName, price: updatedPrice, description: updatedDescription }
+              : product
+          )
+        );
+
+        setEditMode(null);
+      })
+      .catch((err) => console.error(err));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      if (editId) {
-        await axios.put(`https://full-stack-app-deployment.onrender.com/products/${editId}`, form, { headers: { Authorization: `Bearer ${token}` } });
-        toast.success("Product updated!");
-      } else {
-        await axios.post("http://localhost:8999/products", form, { headers: { Authorization: `Bearer ${token}` } });
-        toast.success("Product created!");
-      }
-      fetchProducts();
-      setForm({ name: "", price: "" });
-      setEditId(null);
-    } catch (error) {
-      toast.error("Operation failed!");
-    }
-  };
-
-  const handleDelete = async (id) => {
-    try {
-      await axios.delete(`https://full-stack-app-deployment.onrender.com/products/${id}`, { headers: { Authorization: `Bearer ${token}` } });
-      toast.success("Product deleted!");
-      fetchProducts();
-    } catch (error) {
-      toast.error("Failed to delete!");
-    }
+  // Handle product deletion
+  const handleDelete = (productId) => {
+    fetch(`https://full-stack-app-deployment.onrender.com/products/${productId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        alert(data.message);
+        setProducts((prevProducts) => prevProducts.filter((product) => product._id !== productId));
+      })
+      .catch((err) => console.error(err));
   };
 
   return (
-    <div>
-      <h2>Dashboard</h2>
-      <form onSubmit={handleSubmit}>
-        <input type="text" placeholder="Product Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
-        <input type="text" placeholder="Description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} required />
-        <input type="number" placeholder="Price" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} required />
-        <button type="submit">{editId ? "Update" : "Create"}</button>
-      </form>
-      <ul>
-        {products.map((product) => (
-          <li key={product._id}>
-            {product.name} - ${product.price}
-            <button onClick={() => setEditId(product._id)}>Edit</button>
-            <button onClick={() => handleDelete(product._id)}>Delete</button>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <>
+      <h2>Welcome to Your Product Dashboard</h2>
+      <div>
+        {products.length > 0 ? (
+          products.map((product) => (
+            <div key={product._id}>
+              {editMode === product._id ? (
+                <>
+                  <input
+                    type="text"
+                    placeholder="Enter updated name"
+                    value={updatedName}
+                    onChange={(e) => setUpdatedName(e.target.value)}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Enter updated price"
+                    value={updatedPrice}
+                    onChange={(e) => setUpdatedPrice(e.target.value)}
+                  />
+                  <textarea
+                    placeholder="Enter updated description"
+                    value={updatedDescription}
+                    onChange={(e) => setUpdatedDescription(e.target.value)}
+                  />
+                  <button onClick={() => handleEdit(product._id)}>Save</button>
+                  <button onClick={() => setEditMode(null)}>Cancel</button>
+                </>
+              ) : (
+                <>
+                  <h3>Name: {product.name}</h3>
+                  <p>Price: {product.price}</p>
+                  <p>Description: {product.description}</p>
+                  <button
+                    onClick={() => {
+                      setEditMode(product._id);
+                      setUpdatedName(product.name);
+                      setUpdatedPrice(product.price);
+                      setUpdatedDescription(product.description);
+                    }}
+                  >
+                    Edit
+                  </button>
+                  <button onClick={() => handleDelete(product._id)}>Delete</button>
+                </>
+              )}
+            </div>
+          ))
+        ) : (
+          <h2>No Products to display</h2>
+        )}
+      </div>
+    </>
   );
 };
 

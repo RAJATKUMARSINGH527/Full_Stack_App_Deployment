@@ -12,12 +12,12 @@ productRoutes.get("/", async (req, res) => {
 
 // Create a product (authenticated users only)
 productRoutes.post("/", verifyToken, async (req, res) => {
-  const { name, price, description } = req.body;
+  // const { name, price, description } = req.body;
 
   try {
-    const product = new ProductModel({ name, price, description, user: req.userId });
+    const product = new ProductModel(req.body);
     await product.save();
-    res.status(201).json(product);
+    res.status(201).json({message:"Product created Successfully",product});
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

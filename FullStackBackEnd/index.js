@@ -9,7 +9,15 @@ const app = express();
 //middleware to pass the request body
 app.use(express.json());
 
-app.use(cors());   //to allow cross origin requests from the frontend to the backend server
+app.use(cors(
+    {
+        Origin:"http://localhost:5173/",
+        methods: ['GET', 'POST', 'PUT', 'DELETE'],
+        credentials: true,
+        allowedHeaders: ['Content-Type', 'Authorization'],
+        
+    }
+));   //to allow cross origin requests from the frontend to the backend server
 //  because the frontend and backend are running on different ports so we need to allow the cross origin requests 
 //  from the frontend to the backend server so that the frontend can communicate with the backend server 
 
@@ -18,7 +26,7 @@ app.use("/auth", authRoutes);
 app.use("/products", productRoutes);
 
 
-const PORT = process.env.PORT || 8999;
+const PORT = process.env.PORT || 9999;
 
 app.listen(PORT, async() => {
     try {
