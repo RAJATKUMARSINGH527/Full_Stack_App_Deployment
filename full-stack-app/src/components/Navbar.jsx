@@ -17,10 +17,10 @@ const Navbar = () => {
   };
 
   return (
-    <Box bg="gray.800" py={4} px={8} color="white">
+    <Box bg="blue.500" py={4} px={8} color="white">
       <Flex justify="space-between" align="center">
         <Heading size="lg" color="teal.300">
-          <Link to="/">FullStackApp</Link>
+          <Link to="/">SHOPEASE</Link>
         </Heading>
 
         <HStack spacing={6}>

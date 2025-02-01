@@ -5,7 +5,7 @@ import Home from "./pages/Home";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
-import Products from "./components/Products";
+
 
 const App = () => {
   const token = localStorage.getItem("token"); // Check if user is logged in
@@ -20,7 +20,7 @@ const App = () => {
           <Route path="/login" element={<Login />} />
           {/* Protected Routes */}
           <Route path="/dashboard" element={token ? <Dashboard /> : <Login />} />
-          <Route path="/products" element={token ? <Products /> : <Login />} />
+          
         </Routes>
       </main>
     </BrowserRouter>
