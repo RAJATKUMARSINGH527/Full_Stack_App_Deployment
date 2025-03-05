@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, Button, Input, Heading, Text, Spinner, Flex, Link } from "@chakra-ui/react";
+import { bcUrl } from "../urlStore/bcUlr";
 
 const Signup = () => {
   const [name, setName] = useState("");
@@ -14,11 +15,10 @@ const Signup = () => {
     setLoading(true);
 
     try {
-      const res = await fetch("https://full-stack-app-deployment.onrender.com/auth/signup", {
+      const res = await fetch(`${bcUrl}/auth/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
-        // mode: "no-cors",
       });
 
       const data = await res.json();

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { bcUrl } from "../urlStore/bcUlr";
 import {
   Box,
   Button,
@@ -32,7 +33,7 @@ const Dashboard = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch("https://full-stack-app-deployment.onrender.com/products", {
+      const response = await fetch(`${bcUrl}/products`, {
         method: "GET",
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
@@ -52,7 +53,7 @@ const Dashboard = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        `https://full-stack-app-deployment.onrender.com/products/${productId}`,
+        `${bcUrl}/products/${productId}`,
         {
           method: "PUT",
           headers: {
@@ -81,7 +82,7 @@ const Dashboard = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        `https://full-stack-app-deployment.onrender.com/products/${productId}`,
+        `${bcUrl}/products/${productId}`,
         {
           method: "DELETE",
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },

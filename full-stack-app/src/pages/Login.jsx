@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, Button, Input, Heading, Text, Spinner, Flex, Link } from "@chakra-ui/react";
+import { bcUrl } from "../urlStore/bcUlr";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -14,7 +15,7 @@ const Login = () => {
 
     try {
       const res = await fetch(
-        "https://full-stack-app-deployment.onrender.com/auth/login",
+        `${bcUrl}/auth/login`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
